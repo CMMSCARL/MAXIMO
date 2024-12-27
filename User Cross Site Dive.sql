@@ -1,28 +1,28 @@
 --	select * from person where displayname like '%WOODR%'
 
 
-declare @USER varchar(12) = 'myz904' --DWOODRUFF      mha78' --MCL131'		--JRE913' --rta252' --GMA471' --hhe76' --kwh336' --ggo373'  --cro652'    --RFO223'  RWalton   JHU812      ARI129 RHO184  mbr663 hde751 CHI579
-declare @WONUM varchar(24); set @WONUM = 'KDO%%'
+declare @USER varchar(12) = 'myz904' 
+declare @WONUM varchar(24); set @WONUM = '%%'
 declare @CITY varchar(24); set @CITY = (select city from person where personid = @USER)
-declare @DEFSITE varchar(4) = (select mu.defsite from maxuser mu where mu.userid like @USER);  declare @DefSiteGrp varchar(24) = (select top 1 groupname from maxgroup where groupname like '%' + @DEFSITE + '%')
+declare @DEFSITE varchar(4) = (select mu.defsite from maxuser mu where mu.userid like @USER);  
+declare @DefSiteGrp varchar(24) = (select top 1 groupname from maxgroup where groupname like '%' + @DEFSITE + '%')
+
 declare @DETAILS varchar(1);	set @DETAILS	= 1	;	-->>>-- Setting to 1 will also show Qualificaitons, Work Orders, and Workflow Assignments
-declare @NEAR varchar(1);		set @NEAR		= 1	;	-->>>-- Setting to 1 will also show Admins for this Default Site
+declare @NEAR varchar(1);	set @NEAR	= 1	;	-->>>-- Setting to 1 will also show Admins for this Default Site
 
 select mu.userID as 'USER', mu.status as 'U.Status', p.PersonID, p.status as 'P.Status', p.displayname as 'User Name', p.Title, p.City, p.Department, mu.defsite , p.supervisor as 'Supr ID', p2.displayname as 'Supervisor' --, pa1.Ancestor as 'Dad', pa2.Ancestor as 'Grand', pa3.Ancestor as 'Creat'
 from person p  left join maxuser mu on mu.personid = P.personid  Left join person p2 on p.supervisor =  p2.personid  --	left join personancestor pa1 on p.personid = pa1.personid and pa1.hierarchylevels = 1 left join personancestor pa2 on p.personid = pa2.personid and pa2.hierarchylevels = 2 left join personancestor pa3 on p.personid = pa3.personid and pa3.hierarchylevels = 3
 where p.personid like @USER order by p.displayname
 
---	select  * from personancestor where personid = @USER order by hierarchylevels
+select  * from personancestor where personid = @USER order by hierarchylevels
 
 select PersonID as 'Minions', DisplayName, Title, LocationSite, City, stateprovince from person where supervisor = @USER and status = 'ACTIVE'
 
-Select gu.GroupName, sa.SiteID from groupuser gu left join siteauth sa on gu.groupname = sa.groupname
-where gu.userid like @USER --and gu.groupname not in ('MAXDEFLTREG', 'MAXEVERYONE', 'SG-APP-MAX-MAXACCESS')
+Select gu.GroupName, sa.SiteID from groupuser gu left join siteauth sa on gu.groupname = sa.groupname where gu.userid like @USER --and gu.groupname not in ('MAXDEFLTREG', 'MAXEVERYONE', 'SG-APP-MAX-MAXACCESS')
 
 Select LaborCode, Craft, case when DefaultCraft = 0 then 'NO' else 'YES' end as 'Def' from laborcraftrate where laborcode like @USER
 
-select * -- UserID as 'Sessions', DisplayName, ClientAddr, format(logindatetime, 'MM/dd HH:mm', 'en-US') as 'Login Time' 
-from MAXSESSION where USERID = @USER
+select UserID as 'Sessions', DisplayName, ClientAddr, format(logindatetime, 'MM/dd HH:mm', 'en-US') as 'Login Time' from MAXSESSION where USERID = @USER
 
 select top 6 UserID as 'Logins', AttemptDate, AttemptResult, ClientHost from LOGINTRACKING where USERID = @USER order by attemptdate desc
 
